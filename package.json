@@ -5,7 +5,43 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "pack": "electron-packager . nx-fork-manager --platform=win32 --arch=x64 --out=dist"
+    "dist": "electron-builder --win",
+    "dist:zip": "electron-builder --win zip",
+    "dist:portable": "electron-builder --win portable",
+    "dist:dir": "electron-builder --dir"
+  },
+  "build": {
+    "appId": "com.nx-fork-manager.gui",
+    "productName": "NX Fork Manager",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "zip",
+        "nsis"
+      ],
+      "artifactName": "${productName}-${version}-windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "extraFiles": [
+      "fork-manager.ps1",
+      "forks.json",
+      "ForkManager.cmd",
+      "LICENSE",
+      "README.md"
+    ]
   },
   "keywords": [
     "switch",
@@ -20,6 +56,7 @@
     "marked": "^15.0.7"
   },
   "devDependencies": {
-    "electron": "^45.2.3"
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0"
   }
 }

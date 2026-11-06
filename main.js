@@ -4,8 +4,31 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 
 let mainWindow = null;
-const ROOT_DIR = __dirname;
-const SCRIPT_PATH = path.join(ROOT_DIR, 'fork-manager.ps1');
+const ROOT_DIR = app.isPackaged ? path.dirname(process.execPath) : __dirname;
+
+function getScriptPath() {
+  const direct = path.join(ROOT_DIR, 'fork-manager.ps1');
+  if (fs.existsSync(direct)) return direct;
+  if (process.resourcesPath) {
+    const res = path.join(process.resourcesPath, 'fork-manager.ps1');
+    if (fs.existsSync(res)) return res;
+    const unpacked = path.join(process.resourcesPath, 'app.asar.unpacked', 'fork-manager.ps1');
+    if (fs.existsSync(unpacked)) return unpacked;
+  }
+  return direct;
+}
+
+function getCatalogPath() {
+  const direct = path.join(ROOT_DIR, 'forks.json');
+  if (fs.existsSync(direct)) return direct;
+  if (process.resourcesPath) {
+    const res = path.join(process.resourcesPath, 'forks.json');
+    if (fs.existsSync(res)) return res;
+  }
+  return direct;
+}
+
+const SCRIPT_PATH = getScriptPath();
 
 function readJsonFile(filePath, fallback = null) {
   try {
@@ -49,7 +72,7 @@ function getAppConfig() {
 
 function getFullAppState() {
   const config = getAppConfig();
-  const catalog = readJsonFile(path.join(ROOT_DIR, 'forks.json'), { forks: [] });
+  const catalog = readJsonFile(getCatalogPath(), { forks: [] });
   const myForks = readJsonFile(path.join(ROOT_DIR, 'my-forks.json'), { forks: [] });
   const state = readJsonFile(path.join(ROOT_DIR, 'data', 'state.json'), {});
   const checks = readJsonFile(path.join(ROOT_DIR, 'data', 'checks.json'), {});

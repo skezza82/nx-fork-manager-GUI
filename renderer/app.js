@@ -1,5 +1,6 @@
 // NX Fork Manager GUI Application Logic
 (function () {
+  console.log('[app.js] Script loaded, initializing...');
   let appState = null;
   let activeTab = 'forks';
   let forkFilter = 'all';
@@ -947,9 +948,17 @@
 
   // Initialize App
   async function init() {
-    setupEventListeners();
-    await refreshState();
-    checkApiQuota();
+    console.log('[app.js] init() called');
+    try {
+      setupEventListeners();
+      console.log('[app.js] setupEventListeners() done');
+      await refreshState();
+      console.log('[app.js] refreshState() done');
+      checkApiQuota();
+      console.log('[app.js] checkApiQuota() started');
+    } catch (e) {
+      console.error('[app.js] init() error:', e);
+    }
   }
 
   init();

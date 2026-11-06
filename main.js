@@ -202,7 +202,7 @@ function createWindow() {
     minWidth: 1000,
     minHeight: 680,
     backgroundColor: '#0b0d13',
-    show: false,
+    show: true,
     frame: true,
     titleBarStyle: 'default',
     title: 'NX Fork Manager',
@@ -214,11 +214,15 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
-
-  mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    console.log(`[Renderer Log] ${message} (${sourceId}:${line})`);
   });
+
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    console.error(`[Renderer Fail Load] ${errorCode}: ${errorDescription} (${validatedURL})`);
+  });
+
+  mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);

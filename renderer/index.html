@@ -5,7 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NX Fork Manager</title>
   <link rel="stylesheet" href="style.css">
-  <script src="../node_modules/marked/marked.min.js"></script>
+  <script>
+    window.addEventListener('error', (e) => {
+      console.error('[UNCAUGHT ERROR]', e.message, 'at', e.filename, ':', e.lineno);
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      console.error('[UNHANDLED PROMISE REJECTION]', e.reason);
+    });
+  </script>
+  <script src="../node_modules/marked/lib/marked.umd.js"></script>
 </head>
 <body>
   <div id="app" class="app-container">

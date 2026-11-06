@@ -1,283 +1,114 @@
-# nx-fork-manager
+# NX Fork Manager GUI 🎮
 
-A small Windows tool that keeps your Switch emulator forks up to date and tells you which fork to use for each game.
+A modern, high-performance Windows desktop GUI for [nx-fork-manager](https://github.com/Schroederr/nx-fork-manager) that keeps your Nintendo Switch emulator forks up to date and tells you which fork to use for each game.
 
-New fork builds come out almost every day. Without this tool you open the releases page, download the right zip, delete the old folder, extract the new one and only then play. This tool does all of that for you, keeps the previous version for rollback, and shows the best fork for each game from the [riyadhHDA/wichforks](https://github.com/riyadhHDA/wichforks) community guide.
+Powered by community compatibility data from [riyadhHDA/wichforks](https://github.com/riyadhHDA/wichforks).
 
-It only installs ready-made release builds that the fork authors publish. It does not compile anything.
+![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-## Features
+---
 
-- Installs and updates forks from GitHub releases, GitHub Actions builds, and Forgejo releases.
-- Adds a new fork from a pasted link. The tool finds the Windows build and writes the rule for future builds.
-- Verifies every download. It checks the SHA-256 when the source publishes one, and the file size otherwise.
-- Keeps the previous version of each fork. You can roll back with one key, and a rollback pins the fork so the next update does not undo it.
-- Never replaces a fork while it is running.
-- Shows a "best fork per game" table from the wichforks guide, filtered by your GPU vendor (NVIDIA, AMD or Intel).
-- Lets you record your own results per game. Your choice overrides the guide on your machine.
-- Uses only built-in Windows tools: PowerShell 5.1 and `curl.exe`. There is nothing to install.
+## ✨ Features
 
-## Requirements
+- **🎮 Fork Library Dashboard**:
+  - One-click **Launch**, **Update**, **Check**, and **Install** for all known Switch emulator forks (Eglantine, Lichii, Orchid, PokeDinner, Selevet, SmileyTatsu, and more).
+  - Automatically downloads, verifies SHA-256 hashes / file sizes, and extracts ready-made Windows releases.
+  - Safe rollback to previous versions with 1-click **Rollback** and **Pin** to prevent accidental updates.
+  - Never overwrites an emulator while it is currently running.
+  - Card View and Table View with live search and filter pills (*All*, *Installed*, *Pinned*, *Custom*).
+
+- **🎯 Which Fork For Which Game**:
+  - Browse community recommendations per game from the `wichforks` guide.
+  - **Launch Recommended Fork** with a single click (automatically installs the build if not present).
+  - Add **Personal Game Notes** and set custom overrides (your own benchmarks and preferences take precedence over the community guide).
+  - Auto-filtered by your detected GPU (NVIDIA, AMD, or Intel) to prevent crashes on incompatible architectures.
+
+- **➕ Add Any Fork from a Link**:
+  - Paste any GitHub repository, GitHub release URL, Forgejo / Gitea repo, or GitHub Actions workflow link.
+  - Auto-detects the latest Windows build zip and saves regex pattern matching for future daily updates.
+
+- **📖 Built-in Wichforks Knowledge Base**:
+  - Read community reports, performance tables (`PERFORMANCE.md`), project notes (`PROJECT-NOTES.md`), and game-specific guides without leaving the app.
+
+- **⚙️ Hardware & API Settings**:
+  - GPU vendor switching (AMD / NVIDIA / Intel / None).
+  - Configurable fork install directory with folder picker.
+  - Integrated GitHub Personal Access Token validator (showing remaining API quota out of 5,000 requests/hr).
+
+- **📟 Real-time Console & Download Drawer**:
+  - Live streaming log console showing download speeds, extraction status, and verification checks.
+
+---
+
+## 🚀 Quick Start
+
+### 1. Launch with One Click
+Double-click:
+```cmd
+ForkManagerGUI.cmd
+```
+*(If dependencies are not yet installed, the script will automatically install them on the first run and launch the GUI).*
+
+### 2. Or Launch via Terminal
+```bash
+npm install
+npm start
+```
+
+### 3. Classic Terminal Menu (Optional)
+The original CLI tool is fully preserved and can still be opened at any time:
+```cmd
+ForkManager.cmd
+```
+
+---
+
+## 🔑 GitHub API Token (Recommended)
+
+Without a token, GitHub limits unauthenticated requests to **60 requests per hour per IP address**.
+A free personal access token raises your limit to **5,000 requests per hour** and allows direct artifact downloads.
+
+1. Open [GitHub Personal Access Tokens](https://github.com/settings/personal-access-tokens/new).
+2. Choose **Public Repositories (read-only)**. No extra permissions needed.
+3. Open the **Settings** tab in NX Fork Manager GUI, paste your token, and click **Test Token & Save**.
+
+---
+
+## 📁 Project Structure
+
+```
+├── ForkManagerGUI.cmd     # One-click Windows GUI launcher
+├── ForkManager.cmd        # Original interactive console menu
+├── fork-manager.ps1       # Core PowerShell engine
+├── forks.json             # Emulator fork catalog
+├── my-forks.json          # User-added custom forks
+├── main.js                # Electron desktop backend
+├── preload.js             # Secure IPC context bridge
+├── renderer/
+│   ├── index.html         # Modern Switch-themed UI
+│   ├── style.css          # Neon cyber aesthetic & responsive styles
+│   └── app.js             # Reactive application logic
+├── data/
+│   ├── state.json         # Installed versions, tags, and rollback states
+│   ├── my-notes.json      # User game notes & personal overrides
+│   └── wichforks/         # Synced community guide and markdown docs
+└── forks/                 # Installed emulator folders
+```
+
+---
+
+## ⚖️ Requirements & Notice
 
 - Windows 10 (1803 or later) or Windows 11.
+- Node.js (v18 or newer).
 - An internet connection.
-- Your own keys and firmware, dumped from your own console. This tool does not download keys, firmware or games.
+- **Your own keys and firmware**, dumped from your own Nintendo Switch console. This tool does not provide, host, or download games, keys, or copyrighted system firmware.
 
-## Quick start
+---
 
-1. Download this repository. Click **Code > Download ZIP** on GitHub and extract it, or run:
+## 📜 Credits
 
-   ```bash
-   git clone https://github.com/Schroederr/nx-fork-manager.git
-   ```
-
-2. Double-click `ForkManager.cmd`.
-3. On the first run the tool creates `config.json`, detects your GPU vendor and downloads the wichforks guide.
-4. Type a fork number and press Enter. The tool downloads that fork, installs it in the `forks` folder and opens it.
-
-From then on, open the emulator through `ForkManager.cmd`. Each time it starts, it checks the installed forks and installs any new release before it shows the menu.
-
-## The menu
-
-```
-FORKS
-   1  Eglantine (Djihads80)    daily-20261105 (previous: build-212)
-   2  Lichii                   build-75
-   3  Lichii (git build)       not installed
-   ...
-
-GAMES
-  g1  Mario Kart World                     SmileyTatsu (guide: SmileyTatsu)
-  g3  Donkey Kong Bananza                  Selevet (guide: Selevet perf 3/4)
-  ...
-```
-
-| Type | What it does |
-|---|---|
-| `2` | Opens fork 2. If it is not installed, the tool installs it first. |
-| `g3` | Opens the recommended fork for game 3. |
-| `n3` | Adds a note for game 3: which fork you tested, the result, and if that fork becomes your default for the game. |
-| `r1` | Rolls fork 1 back to the previous version and pins it. |
-| `p1` | Pins or unpins fork 1. A pinned fork does not get updates. |
-| `a` | Adds a fork from a link. See [Add a fork from a link](#add-a-fork-from-a-link). |
-| `x12` | Removes fork 12 and its installed files. This works only for forks you added. |
-| `u` | Checks for updates now, ignoring the check interval. |
-| `b` | Opens `GAMES.md`, the full table with evidence from the guide and your notes. |
-| `q` | Quits. |
-
-Only installed forks get updates. A fork you never opened does not use disk space or API requests.
-
-## Add a fork from a link
-
-A new fork came out and it is not in the list? Type `a` in the menu and paste its link. These links work:
-
-| Link | Example |
-|---|---|
-| GitHub repository, releases page or release | `https://github.com/Frizti/Lichii/releases/tag/frizti-v1` |
-| Forgejo or Gitea repository | `https://git.eden-emu.dev/Franseven/PokeDinner-a-Eglantine-Fork` |
-| GitHub Actions workflow, for forks that publish builds only through Actions | `https://github.com/zortos293/Lichii/actions/workflows/release-binaries.yml` |
-
-The tool then:
-
-1. Reads the newest releases (or the newest successful Actions runs) and picks the Windows `.zip`. It prefers MSVC builds and skips Linux, macOS, Android, ARM, PGO, debug and symbol files.
-2. Turns the file name into a rule that also matches future builds. For example, `selevet-eglantine-performance-7-windows-x86_64.zip` becomes `^selevet-eglantine-performance-\d+[a-z]?-windows-x\d+[a-z]?_\d+[a-z]?\.zip$`.
-3. Checks that the rule finds the same build, and saves the fork in `my-forks.json`.
-4. If the wichforks guide knows the fork, takes its name and id, so the fork shows up in the game recommendations and the GPU filter.
-5. Asks if you want to install and open it now.
-
-Forks you add get a `*` in the menu. `my-forks.json` is not tracked by git, so updates of this tool keep your forks.
-
-If the tool picks the wrong file, or the fork renames its files later, edit the `include` and `exclude` rules in `my-forks.json`. The keys are the same as in `forks.json` (see [forks.json](#forksjson-the-fork-catalog)).
-
-If a fork has no Windows build yet, the tool says so and adds nothing. Try again after the author publishes one.
-
-## Command line
-
-You can also run single actions, for example from a scheduled task:
-
-```bash
-powershell -NoProfile -ExecutionPolicy Bypass -File fork-manager.ps1 -Action Update
-```
-
-| Action | What it does |
-|---|---|
-| `Menu` | Default. Interactive menu. |
-| `Status` | Lists forks, installed versions and game recommendations. |
-| `Check` | Shows the latest release of every fork (or of `-Fork <id>`) without installing. |
-| `Update` | Updates all installed forks, or only `-Fork <id>`. |
-| `Install -Fork <id> [-Tag <tag>]` | Installs the latest release, or a specific tag. |
-| `Rollback -Fork <id>` | Swaps to the previous version and pins it. |
-| `Pin -Fork <id>` / `Unpin -Fork <id>` | Stops or resumes updates for a fork. |
-| `Open -Fork <id>` | Opens a fork, installing it first if needed. |
-| `Sync` | Downloads the latest wichforks guide. |
-| `Add -Url <link>` | Adds a fork from a link. |
-| `Remove -Fork <id>` | Removes a fork you added, with its installed files. |
-
-Fork ids are in `forks.json` (for example `selevet`, `pokedinner`, `lichii-git`). For an Actions build, `-Tag` takes the build name, for example `-Tag build-80`.
-
-## 403 errors and the GitHub API limit
-
-### The problem
-
-Without a login, the GitHub API accepts only **60 requests per hour per IP address**. When the limit runs out, GitHub answers `403 rate limit exceeded` and the tool shows:
-
-```
-GitHub API limit reached (60 requests per hour without a token). Resets at 21:14. Set GITHUB_TOKEN for a limit of 5000.
-```
-
-You reach the limit faster than you expect, because:
-
-- Each fork check uses one request, and an Actions build ("git build") uses two or more. The guide sync uses two or three.
-- Every program on your network shares the same 60 requests: other launchers, browser extensions, another PC on the same router, or a VPN exit that many people use.
-- An answer of "nothing changed" (HTTP 304) still counts.
-- Pressing `u` several times, or running `-Action Check` for all forks, uses many requests at once.
-
-The file downloads themselves do not count. Only the API questions ("what is the latest release?") count.
-
-### What the tool already does
-
-- The menu checks each fork at most once per `check_interval_minutes` (60 by default). A second start within the hour uses no requests.
-- When the limit runs out, the tool stops asking GitHub, shows the reset time once, and keeps your installed versions as they are. Forgejo forks (PokeDinner) still update, because the limit is GitHub only.
-- A fork that failed to update is checked again next time, so nothing is skipped for good.
-
-### The fix: a GitHub token (recommended)
-
-A token raises the limit to **5000 requests per hour**, only for you. It also lets the tool download Actions builds directly from GitHub instead of through nightly.link. It is free and takes two minutes:
-
-1. Sign in to GitHub. If you do not have an account, create one.
-2. Open <https://github.com/settings/personal-access-tokens/new>.
-3. Give the token a name, for example `nx-fork-manager`. Choose an expiration date.
-4. Under **Repository access**, choose **Public repositories**. Do not add any permissions. A token without permissions can only read public data.
-5. Click **Generate token** and copy it. It starts with `github_pat_`.
-6. Open a Command Prompt and save the token as a user environment variable:
-
-   ```bash
-   setx GITHUB_TOKEN "paste-your-token-here"
-   ```
-
-7. Close every open `ForkManager.cmd` window and open it again. `setx` affects only windows opened after it.
-
-To check that the token works, open a new Command Prompt and run:
-
-```bash
-curl -s -H "Authorization: Bearer %GITHUB_TOKEN%" https://api.github.com/rate_limit
-```
-
-The `core` section must show `"limit": 5000`. Without the header the same command shows how much of the 60 is left on your IP address.
-
-The tool sends the token only to `api.github.com`. Do not share it, do not paste it in chats or issues, and do not save it in any file in this folder. If it leaks, delete it on the same GitHub page and create a new one.
-
-### Without a token
-
-- Wait until the reset time the tool shows, then open it again.
-- Raise `check_interval_minutes` in `config.json`, for example to `180`.
-- Do not press `u` repeatedly. Normal starts are enough.
-- Install only the forks you use. Forks you never opened are never checked.
-
-### Other GitHub errors
-
-- **"GitHub rejected GITHUB_TOKEN (401 Bad credentials)"**: the token expired or was deleted. Create a new one and run `setx` again, or remove it with `reg delete HKCU\Environment /v GITHUB_TOKEN /f` to go back to the 60-per-hour limit.
-- **"GitHub refused the request (403)" without "limit reached"**: GitHub's short-term abuse protection. Wait a few minutes.
-
-## Configuration
-
-### config.json (your settings)
-
-The first run creates this file. It is not tracked by git, so updates of this tool never overwrite it.
-
-```json
-{
-  "gpu": "NVIDIA",
-  "install_dir": "forks",
-  "check_interval_minutes": 60
-}
-```
-
-| Key | Meaning |
-|---|---|
-| `gpu` | `NVIDIA`, `AMD` or `Intel`. Hides guide recommendations for forks that the guide marks as not working on your GPU. Set it to `""` to turn off the filter. |
-| `install_dir` | Where forks are installed. A relative path starts from this folder. An absolute path also works. In JSON, write backslashes twice: `"D:\\Emulators\\forks"`. |
-| `check_interval_minutes` | How often the menu checks each fork. The `u` key ignores it. |
-
-### forks.json (the fork catalog)
-
-This file lists the forks that ship with the tool. To add a fork for yourself, use `a` in the menu: it writes the same kind of entry to `my-forks.json`. To add a fork for everyone, add an entry here and open a pull request:
-
-```json
-{
-  "id": "myfork",
-  "name": "My Fork",
-  "source": "github",
-  "repo": "someone/MyFork",
-  "include": "windows-x86_64.*\\.zip$",
-  "exclude": "pgo|symbols",
-  "exe": "myfork.exe",
-  "aliases": ["MyFork"],
-  "wichforks_id": null
-}
-```
-
-| Key | Meaning |
-|---|---|
-| `id` | Short unique name. It is also the folder name in `install_dir`. |
-| `name` | Name shown in the menu. |
-| `source` | `github` (GitHub releases), `forgejo` (Forgejo or Gitea releases, needs `host`), or `actions` (newest successful GitHub Actions run, needs `workflow`). |
-| `repo` | `owner/repository`. |
-| `host` | Forgejo only. For example `git.eden-emu.dev`. |
-| `workflow`, `branch` | Actions only. The workflow file name, and an optional branch. `null` means any branch. |
-| `include`, `exclude` | Regular expressions for the release asset (or artifact) name. The first asset that matches `include` and does not match `exclude` is used. |
-| `tags`, `release_exclude` | Optional. Regular expressions that skip releases by tag or by title, for example test branches or "experimental" builds. |
-| `exe` | Main executable. If you leave it out, the tool uses the first `.exe` it finds. |
-| `aliases` | Words that identify this fork in the wichforks game table. |
-| `wichforks_id` | The fork id in the guide's `data/forks.json`. The GPU filter uses it. |
-
-If you add a fork that others can use too, please open a pull request.
-
-## How an update works
-
-1. The tool asks the GitHub or Forgejo API for the newest release that matches the fork's rules.
-2. It downloads the zip to `data\_tmp` and verifies the size and, when available, the SHA-256.
-3. It extracts the zip and finds the folder with the main executable.
-4. It moves the current version to `<install_dir>\_previous\<id>` and moves the new one into place. If a step fails, the current version stays as it was.
-5. It records the version in `data\state.json`.
-
-A verified hash proves that the file arrived intact. It does not prove that the build is safe. Only install forks whose authors you trust.
-
-Most forks in the catalog are based on Eden/Eglantine and share the same user folder (`%APPDATA%\eden`), so your saves, keys and settings stay when you switch between forks or update them. If a fork runs in portable mode (a `user` folder next to the exe), the tool moves that folder to the new version.
-
-## Files
-
-| Path | Tracked by git | Content |
-|---|---|---|
-| `ForkManager.cmd` | yes | Launcher. |
-| `fork-manager.ps1` | yes | The tool. |
-| `forks.json` | yes | Fork catalog. |
-| `config.json` | no | Your settings. |
-| `my-forks.json` | no | Forks you added from links. |
-| `GAMES.md` | no | Generated table of the best fork per game. |
-| `data\state.json` | no | Installed and previous versions. |
-| `data\my-notes.json` | no | Your notes per game. |
-| `data\checks.json` | no | Time of the last check per fork. |
-| `data\wichforks\` | no | Local copy of the guide. |
-| `forks\` | no | Installed forks (default `install_dir`). |
-
-To update the tool itself, download the new `fork-manager.ps1`, `forks.json` and `ForkManager.cmd`, or run `git pull`. Your settings, notes and installed forks are not touched.
-
-## Troubleshooting
-
-- **"GitHub API limit reached" or 403**: see [403 errors and the GitHub API limit](#403-errors-and-the-github-api-limit).
-- **"No release of ... has a Windows .zip"** when you add a fork: the fork has no Windows build yet, or only publishes Actions builds. Paste the workflow link instead.
-- **"... is running. Close it and try again."**: close the emulator. The tool never replaces files in use.
-- **"Build ... has no valid Windows artifact"**: GitHub deletes Actions artifacts after a few days. Use a newer build.
-- **Windows SmartScreen or antivirus warnings**: these come from the emulator builds, not from this tool. Check the fork's release page if you are not sure.
-- **A fork update broke a game**: type `r` and the fork number to go back. The fork stays pinned until you unpin it with `p`.
-
-## Credits and disclaimer
-
-- Game recommendations come from [riyadhHDA/wichforks](https://github.com/riyadhHDA/wichforks). The tool downloads the guide at run time and does not redistribute it.
-- Actions builds without a token come through [nightly.link](https://nightly.link), a third-party service.
-- This project is not affiliated with any fork, with the wichforks guide, or with Nintendo. It does not include or distribute emulators, keys, firmware or games. Each fork belongs to its authors and has its own license.
-
-## License
-
-[MIT](LICENSE)
+- Core CLI logic & fork patterns by [Schroederr](https://github.com/Schroederr/nx-fork-manager).
+- Emulator fork matrix & research by [riyadhHDA/wichforks](https://github.com/riyadhHDA/wichforks).
+- GUI designed and developed with ❤️ for the Switch emulation community.

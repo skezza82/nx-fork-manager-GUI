@@ -1,0 +1,25 @@
+{
+  "name": "nx-fork-manager-gui",
+  "version": "1.0.0",
+  "description": "Modern Windows desktop GUI for nx-fork-manager - Switch emulator fork manager & game recommendation guide",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-packager . nx-fork-manager --platform=win32 --arch=x64 --out=dist"
+  },
+  "keywords": [
+    "switch",
+    "emulator",
+    "fork-manager",
+    "gui",
+    "wichforks"
+  ],
+  "author": "Antigravity & Schroederr",
+  "license": "MIT",
+  "dependencies": {
+    "marked": "^15.0.7"
+  },
+  "devDependencies": {
+    "electron": "^45.2.3"
+  }
+}

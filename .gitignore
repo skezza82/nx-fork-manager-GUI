@@ -5,3 +5,8 @@ GAMES.md
 data/
 forks/
 *.tmp
+
+# Node dependencies and build artifacts
+node_modules/
+dist/
+*.log
